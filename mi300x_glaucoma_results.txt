@@ -1,0 +1,85 @@
+MI300X / CompactGlaucomaNet Measurements
+
+ENVIRONMENT
+GPU: AMD Instinct MI300X VF
+PyTorch: 2.12.0+rocm7.14.0
+HIP: 7.14.60850
+VRAM: 191.69 GiB
+Model: CompactGlaucomaNet
+Parameters: 2,793,953
+Input: RGB 3x128x128
+Checkpoint: glaucoma_model.pt
+Checkpoint strict load: PASS
+
+GEMM N=16384
+FP16:
+  best: 575.70 TFLOPS
+  average: 572.17 TFLOPS
+BF16:
+  best: 613.98 TFLOPS
+  average: 608.70 TFLOPS
+
+SYNTHETIC BF16 TRAINING
+batch,images/s,step_ms,peak_GiB
+32,2934.2,10.906,0.748
+64,3264.1,19.607,1.325
+128,3151.6,40.615,2.495
+256,3124.1,81.944,4.819
+512,3059.0,167.375,9.467
+1024,3042.5,336.564,18.764
+
+CURRENT FP32 TRAINING PATH
+batch,images/s,step_ms,peak_GiB
+32,2540.8,12.594,1.331
+64,2791.8,22.924,2.477
+128,2798.5,45.739,4.771
+256,2780.2,92.081,9.357
+512,2734.8,187.217,18.529
+
+TRAINED CHECKPOINT FP32 INFERENCE
+batch,images/s,latency_ms,peak_GiB
+1,669.5,1.494,0.095
+8,5583.7,1.433,0.164
+32,9741.8,3.285,0.403
+64,10670.1,5.998,0.722
+128,10778.0,11.876,1.358
+256,10716.4,23.889,2.632
+512,10650.0,48.075,5.178
+1024,10649.4,96.156,10.272
+
+TORCH.COMPILE INFERENCE
+Eager: 10847.8 images/s
+Compiled: 12582.4 images/s
+Speedup: 1.160x
+First compile/run: 6.067 s
+allclose: PASS
+max_abs_diff: 2.8610229e-06
+
+TORCH.COMPILE FP32 TRAINING — BATCH 128
+Eager: 2802.2 images/s
+Compiled: 3222.1 images/s
+Speedup: 1.150x
+First compiled training step: 12.665 s
+
+FP32 MATMUL PRECISION TEST
+highest: 10822.2 images/s
+high: 10958.0 images/s
+Speedup: 1.013x
+max_abs_diff: 0.004635334
+allclose: FAIL
+
+HBM COPY MEASUREMENT
+size_GiB,GB/s
+1,3945.6
+2,3830.3
+4,3855.8
+8,3842.8
+16,3892.0
+
+NOTES
+- Synthetic training measurements exclude dataset I/O, image decode,
+  transforms, host-to-device transfer, validation and checkpoint overhead.
+- BF16 result is a performance experiment, not validated training behavior.
+- torch.compile produced approximately 15-16% measured acceleration.
+- FP32 matmul precision "high" produced only 1.3% acceleration and failed
+  the selected numerical allclose criterion.

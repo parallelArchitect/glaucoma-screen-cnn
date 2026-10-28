@@ -1,0 +1,21 @@
+data/raw/*
+data/processed/*
+data/interim/*
+!data/raw/.gitkeep
+models/exported/*
+models/quantized/*
+models/nnunet_checkpoints/*
+nnUNet_raw/
+nnUNet_preprocessed/
+nnUNet_results/
+__pycache__/
+*.pyc
+.venv/
+.env
+venv/
+rocm-venv/
+
+# trained weights and REFUGE-derived artifacts (not distributed)
+models/checkpoints/*.pt
+models/checkpoints/*.jpg
+models/checkpoints/refuge_false_*.csv

@@ -1,0 +1,8 @@
+# Install a PyTorch build for your hardware first (CUDA or ROCm):
+#   https://pytorch.org/get-started/locally/
+torch
+torchvision
+numpy
+pillow
+scikit-learn
+scipy
